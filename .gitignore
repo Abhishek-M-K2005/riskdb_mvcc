@@ -1,0 +1,47 @@
+# -----------------------------
+# CMake & Build Directories
+# -----------------------------
+build/
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps/
+
+# -----------------------------
+# Compiled Binaries & Objects
+# -----------------------------
+*.o
+*.obj
+*.so
+*.dylib
+*.a
+*.lib
+*.out
+*.app
+
+# Specific Project Executables (Just in case they leak out of build/)
+mvcc_engine
+mvcc_tests
+mvcc_bench
+
+# -----------------------------
+# macOS Specific
+# -----------------------------
+.DS_Store
+.AppleDouble
+.LSOverride
+*.dSYM/
+
+# -----------------------------
+# IDEs & Text Editors
+# -----------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
