@@ -2,6 +2,8 @@
 # CMake & Build Directories
 # -----------------------------
 build/
+build*/
+cmake-build-*/
 CMakeCache.txt
 CMakeFiles/
 CMakeScripts/
@@ -30,9 +32,30 @@ mvcc_tests
 mvcc_bench
 
 # -----------------------------
+# Node & React Dashboard
+# -----------------------------
+node_modules/
+*/node_modules/
+dashboard/node_modules/
+dist/
+*/dist/
+dashboard/dist/
+.vite/
+*/.vite/
+dashboard/.vite/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.env
+.env.local
+.env.*.local
+
+# -----------------------------
 # macOS Specific
 # -----------------------------
 .DS_Store
+**/.DS_Store
 .AppleDouble
 .LSOverride
 *.dSYM/

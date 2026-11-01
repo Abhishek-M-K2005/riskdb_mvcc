@@ -1,4 +1,9 @@
 cmake_minimum_required(VERSION 3.14)
+
+if(POLICY CMP0135)
+  cmake_policy(SET CMP0135 NEW)
+endif()
+
 project(ParallelMVCCEngine CXX)
 
 # Require modern C++ for std::atomic and memory models
@@ -7,6 +12,23 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Enable aggressive optimization for the engine
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=native")
+
+# Support Homebrew libomp on macOS
+if(APPLE)
+  if(EXISTS "/opt/homebrew/opt/libomp")
+    set(OpenMP_C_FLAGS "-Xpreprocessor -fopenmp -I/opt/homebrew/opt/libomp/include")
+    set(OpenMP_C_LIB_NAMES "omp")
+    set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp -I/opt/homebrew/opt/libomp/include")
+    set(OpenMP_CXX_LIB_NAMES "omp")
+    set(OpenMP_omp_LIBRARY "/opt/homebrew/opt/libomp/lib/libomp.dylib")
+  elseif(EXISTS "/usr/local/opt/libomp")
+    set(OpenMP_C_FLAGS "-Xpreprocessor -fopenmp -I/usr/local/opt/libomp/include")
+    set(OpenMP_C_LIB_NAMES "omp")
+    set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp -I/usr/local/opt/libomp/include")
+    set(OpenMP_CXX_LIB_NAMES "omp")
+    set(OpenMP_omp_LIBRARY "/usr/local/opt/libomp/lib/libomp.dylib")
+  endif()
+endif()
 
 # Find OpenMP (Real GCC handles this natively)
 find_package(OpenMP REQUIRED)
@@ -24,15 +46,9 @@ FetchContent_Declare(
   googlebenchmark
   URL https://github.com/google/benchmark/archive/v1.8.3.zip
 )
-# Fetch Google Benchmark
-FetchContent_Declare(
-  googlebenchmark
-  URL https://github.com/google/benchmark/archive/v1.8.3.zip
-)
 # Disable Google Benchmark's internal tests and strict warnings
 set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
 set(BENCHMARK_ENABLE_WERROR OFF CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googlebenchmark)
 FetchContent_MakeAvailable(googlebenchmark)
 
 # Include directories

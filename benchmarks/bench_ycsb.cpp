@@ -4,6 +4,7 @@
 #include <atomic>
 #include <benchmark/benchmark.h>
 #include <random>
+#include <thread>
 #include <vector>
 
 // Shared Global Database for Benchmark Threads
@@ -55,6 +56,9 @@ static void BM_ZipfianWorkStealing(benchmark::State &state) {
       if (tx.commit(global_epoch.fetch_add(1, std::memory_order_relaxed),
                     *gc_queue)) {
         committed = true;
+      } else {
+        // HARDWARE FIX: Prevent Cache-Line Bouncing Livelock
+        std::this_thread::yield();
       }
     }
 
