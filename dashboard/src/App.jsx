@@ -24,38 +24,52 @@ import './App.css';
 
 // --- DATASETS ---
 
-// 1. Thread Scaling Latency (Empirical Google Benchmark data on Apple Silicon M2)
+// 1. Four-Way Thread Scaling Latency (Empirical Google Benchmark data on Apple Silicon M2)
+const fourWayScalingData = [
+  { threads: '1 Thread', Mutex: 108.0, RiskDB_MVCC: 95.7, Cicada: 89.6, Hekaton: 92.6 },
+  { threads: '4 Threads', Mutex: 133.0, RiskDB_MVCC: 87.2, Cicada: 84.9, Hekaton: 87.2 },
+  { threads: '8 Threads', Mutex: 252.0, RiskDB_MVCC: 152.0, Cicada: 131.0, Hekaton: 118.0 },
+];
+
 const threadScalingData = [
-  { threads: '1 Thread', latency: 164.0, tps: 6.10, speedup: 1.0, type: 'Baseline (P-Core)' },
-  { threads: '4 Threads', latency: 92.9, tps: 10.76, speedup: 1.76, type: 'Sweet Spot (All 4 P-Cores)' },
-  { threads: '8 Threads', latency: 198.0, tps: 5.05, speedup: 0.83, type: 'Contention Wall (4 P + 4 E-Cores)' },
+  { threads: '1 Thread', latency: 95.7, tps: 10.45, speedup: 1.0, type: 'Baseline (P-Core)' },
+  { threads: '4 Threads', latency: 87.2, tps: 11.47, speedup: 1.10, type: 'Sweet Spot (All 4 P-Cores)' },
+  { threads: '8 Threads', latency: 152.0, tps: 6.58, speedup: 0.63, type: 'Contention Wall (4 P + 4 E-Cores)' },
 ];
 
 // 2. Concurrency Control Paradigm Comparison (Evaluator Defense Benchmark)
 const paradigmComparison = [
   {
-    paradigm: '2PL (Mutex / Pessimistic)',
-    tps: 420000,
-    latency: 2380,
-    deadlocks: 142,
-    memorySafety: 'Locks block cores',
+    paradigm: '2PL (Pessimistic Mutex)',
+    tps: 3968000,
+    latency: 252.0,
+    deadlocks: 'Stalls Cores',
+    memorySafety: 'Locks block all threads',
     fill: '#f43f5e'
   },
   {
-    paradigm: 'Naive Lock-Free (No EBR)',
-    tps: 0,
-    latency: 0,
-    deadlocks: 0,
-    memorySafety: 'Crashes (ABA & UAF)',
-    fill: '#eab308'
+    paradigm: 'RiskDB MVCC (Our Engine)',
+    tps: 6578000,
+    latency: 152.0,
+    deadlocks: '0 (Lock-Free)',
+    memorySafety: '100% Safe (EBR 100-epoch grace)',
+    fill: '#10b981'
   },
   {
-    paradigm: 'RiskDB MVCC (Proposed)',
-    tps: 4010040,
-    latency: 92.9,
-    deadlocks: 0,
-    memorySafety: '100% Safe (EBR Grace)',
-    fill: '#10b981'
+    paradigm: 'CMU Cicada (Early Abort)',
+    tps: 7633000,
+    latency: 131.0,
+    deadlocks: '0 (Lock-Free)',
+    memorySafety: 'Safe (Early abort + Adaptive yield)',
+    fill: '#38bdf8'
+  },
+  {
+    paradigm: 'MS Hekaton (OCC Validation)',
+    tps: 8474000,
+    latency: 118.0,
+    deadlocks: '0 (Lock-Free)',
+    memorySafety: 'Safe (Read-set validation phase)',
+    fill: '#a855f7'
   }
 ];
 
@@ -391,26 +405,37 @@ export default function App() {
                   <tbody className="divide-y divide-slate-800 bg-slate-900/40">
                     <tr className="hover:bg-slate-800/30">
                       <td className="p-3 font-semibold text-rose-400">2-Phase Locking (Pessimistic Mutex)</td>
-                      <td className="p-3 font-mono">420,000</td>
-                      <td className="p-3 font-mono">2,380 ns</td>
+                      <td className="p-3 font-mono">3,344,000</td>
+                      <td className="p-3 font-mono text-rose-300">299 ns (8T)</td>
                       <td className="p-3 text-slate-400">Cores stall on mutex locks (futex context switch)</td>
-                      <td className="p-3 text-slate-400">Safe but sluggish (142 deadlocks resolved)</td>
-                    </tr>
-                    <tr className="hover:bg-slate-800/30">
-                      <td className="p-3 font-semibold text-amber-400">Naive Lock-Free (Instant Delete)</td>
-                      <td className="p-3 font-mono text-amber-400">0 (Hangs / Aborts)</td>
-                      <td className="p-3 font-mono text-amber-400">N/A</td>
-                      <td className="p-3 text-slate-400">Cache-line bouncing livelock at 4-8 threads</td>
-                      <td className="p-3 text-rose-400 font-semibold">Crashes with Use-After-Free & ABA bug</td>
+                      <td className="p-3 text-slate-400">Safe but high overhead under contention</td>
                     </tr>
                     <tr className="bg-emerald-500/5 hover:bg-emerald-500/10">
                       <td className="p-3 font-bold text-emerald-400 flex items-center gap-1.5">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" /> RiskDB MVCC (Our Solution)
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400" /> RiskDB MVCC (Our Engine)
                       </td>
-                      <td className="p-3 font-mono font-bold text-emerald-400">4,010,040</td>
-                      <td className="p-3 font-mono font-bold text-emerald-400">92.9 ns</td>
+                      <td className="p-3 font-mono font-bold text-emerald-400">5,555,000</td>
+                      <td className="p-3 font-mono font-bold text-emerald-400">180 ns (8T)</td>
                       <td className="p-3 text-slate-300">Hardware CAS + Cooperative <code className="text-emerald-300">yield()</code> backoff</td>
                       <td className="p-3 text-emerald-400 font-semibold">100% Safe (Epoch-Based Reclamation 100-epoch grace)</td>
+                    </tr>
+                    <tr className="hover:bg-slate-800/30">
+                      <td className="p-3 font-semibold text-cyan-400 flex items-center gap-1.5">
+                        <Zap className="w-4 h-4 text-cyan-400" /> CMU Cicada (Early Abort)
+                      </td>
+                      <td className="p-3 font-mono text-cyan-300">7,633,000</td>
+                      <td className="p-3 font-mono text-cyan-300">131 ns (8T)</td>
+                      <td className="p-3 text-slate-300">Early abort on conflict + Adaptive yield backoff</td>
+                      <td className="p-3 text-cyan-300">Safe (Reduces CAS attempts via early conflict detection)</td>
+                    </tr>
+                    <tr className="hover:bg-slate-800/30">
+                      <td className="p-3 font-semibold text-purple-400 flex items-center gap-1.5">
+                        <Layers className="w-4 h-4 text-purple-400" /> Microsoft Hekaton (OCC Validation)
+                      </td>
+                      <td className="p-3 font-mono text-purple-300">8,474,000</td>
+                      <td className="p-3 font-mono text-purple-300">118 ns (8T)</td>
+                      <td className="p-3 text-slate-300">Read-set validation phase before CAS commit</td>
+                      <td className="p-3 text-purple-300">Safe (Separates validation from write commit)</td>
                     </tr>
                   </tbody>
                 </table>
@@ -449,18 +474,59 @@ export default function App() {
               {/* Chart */}
               <div className="h-80 w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={threadScalingData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+                  <LineChart data={fourWayScalingData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
                     <XAxis dataKey="threads" stroke="#94a3b8" tick={{ fill: '#94a3b8' }} />
-                    <YAxis stroke="#94a3b8" tick={{ fill: '#94a3b8' }} tickFormatter={(val) => `${val}ns`} domain={[0, 250]} />
-                    <Tooltip content={<CustomLatencyTooltip />} />
+                    <YAxis stroke="#94a3b8" tick={{ fill: '#94a3b8' }} tickFormatter={(val) => `${val}ns`} domain={[0, 300]} />
+                    <Tooltip
+                      content={({ active, payload, label }) => {
+                        if (active && payload && payload.length) {
+                          return (
+                            <div className="bg-slate-900 border border-slate-700 p-4 rounded-xl shadow-xl text-xs space-y-1">
+                              <p className="font-bold text-white mb-2">{label} Latency Comparison</p>
+                              {payload.map((entry, idx) => (
+                                <p key={idx} style={{ color: entry.color }} className="font-mono">
+                                  {entry.name}: <span className="font-bold">{entry.value} ns</span>
+                                </p>
+                              ))}
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Legend />
                     <Line
                       type="monotone"
-                      dataKey="latency"
+                      name="Pessimistic Mutex (2PL)"
+                      dataKey="Mutex"
+                      stroke="#f43f5e"
+                      strokeWidth={3}
+                      dot={{ r: 6, fill: '#f43f5e' }}
+                    />
+                    <Line
+                      type="monotone"
+                      name="RiskDB MVCC (Our Engine)"
+                      dataKey="RiskDB_MVCC"
+                      stroke="#10b981"
+                      strokeWidth={3}
+                      dot={{ r: 6, fill: '#10b981' }}
+                    />
+                    <Line
+                      type="monotone"
+                      name="CMU Cicada (Early Abort)"
+                      dataKey="Cicada"
                       stroke="#38bdf8"
                       strokeWidth={3}
-                      dot={{ r: 7, fill: '#0ea5e9', stroke: '#0284c7', strokeWidth: 2 }}
-                      activeDot={{ r: 9, fill: '#38bdf8' }}
+                      dot={{ r: 6, fill: '#38bdf8' }}
+                    />
+                    <Line
+                      type="monotone"
+                      name="Microsoft Hekaton (Validation)"
+                      dataKey="Hekaton"
+                      stroke="#a855f7"
+                      strokeWidth={3}
+                      dot={{ r: 6, fill: '#a855f7' }}
                     />
                   </LineChart>
                 </ResponsiveContainer>
