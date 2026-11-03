@@ -26,10 +26,31 @@ _deps/
 *.out
 *.app
 
-# Specific Project Executables (Just in case they leak out of build/)
+# Specific Project Executables (if executed or copied to root)
 mvcc_engine
 mvcc_tests
 mvcc_bench
+
+# -----------------------------
+# Runtime Generated Telemetry & Dumps
+# -----------------------------
+/engine_telemetry.json
+*.log
+*.tmp
+core
+core.*
+*.stackdump
+crash.log
+
+# -----------------------------
+# Profiling & Coverage
+# -----------------------------
+*.gcda
+*.gcno
+*.gcov
+gmon.out
+perf.data
+perf.data.old
 
 # -----------------------------
 # Node & React Dashboard
@@ -50,21 +71,37 @@ yarn-error.log*
 .env
 .env.local
 .env.*.local
+.eslintcache
 
 # -----------------------------
-# macOS Specific
+# macOS System Files
 # -----------------------------
 .DS_Store
 **/.DS_Store
 .AppleDouble
 .LSOverride
 *.dSYM/
+._*
+.Spotlight-V100
+.Trashes
+
+# -----------------------------
+# Windows System Files
+# -----------------------------
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+desktop.ini
 
 # -----------------------------
 # IDEs & Text Editors
 # -----------------------------
 .vscode/
 .idea/
+*.sublime-project
+*.sublime-workspace
 *.swp
 *.swo
 *~
+.#*
+#*#
