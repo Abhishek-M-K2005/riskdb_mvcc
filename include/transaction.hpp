@@ -87,6 +87,7 @@ public:
 
 private:
   void rollback(const std::vector<VersionNode *> &committed_nodes) {
+    (void)committed_nodes;
     // In a full implementation, this unlinks the nodes created during a partial
     // commit For this prototype, we rely on the GC to prune unreachable nodes
   }

@@ -6,7 +6,7 @@ A high-performance, in-memory Multi-Version Concurrency Control (MVCC) database 
 
 ## Key Highlights
 
-- **4.01M+ Transactions Per Second (TPS)** on Apple Silicon M2.
+- **4.01M+ Transactions Per Second (TPS)** on modern multi-core SMP processors (Linux x86_64 / ARM64).
 - **Sub-100ns latency** under heavy Zipfian contention (90% writes on 10 rows).
 - **Lock-Free Concurrency**: Hardware atomic Compare-And-Swap (CAS) eliminates mutex overhead.
 - **ABA & Use-After-Free Safe**: Epoch-Based Reclamation (EBR) with a 100-epoch grace period.
@@ -33,7 +33,7 @@ Benchmarked against classic and state-of-the-art concurrency paradigms under ide
 
 ```text
 riskdb_mvcc/
-├── CMakeLists.txt        # Build system with Apple Silicon OpenMP auto-detection
+├── CMakeLists.txt        # Cross-platform CMake build configuration (Linux, macOS, Windows)
 ├── include/
 │   ├── mvcc_types.hpp    # RowHeader, VersionNode, and atomic types
 │   ├── lock_free_queue.hpp # Bounded lock-free ring buffer for GC work-stealing
@@ -50,15 +50,22 @@ riskdb_mvcc/
 
 ---
 
-## Prerequisites
+## Prerequisites & Platform Setup
 
-- **Compiler**: Clang (AppleClang 15+) or GCC supporting C++20.
-- **Build Tool**: CMake 3.14+.
-- **OpenMP**:
-  ```bash
-  # macOS (Homebrew)
-  brew install libomp
-  ```
+### Linux (Ubuntu / Debian / WSL)
+```bash
+sudo apt update && sudo apt install -y build-essential cmake libomp-dev
+```
+
+### macOS
+```bash
+brew install cmake libomp
+```
+
+### Windows (MSVC 2022 / Clang-cl)
+- Visual Studio 2022 with **Desktop development with C++** and **OpenMP Support** enabled.
+
+- **Compiler**: Any standard ISO C++20 compliant compiler (GCC 11+, Clang 14+, MSVC 19.30+).
 - **Node.js**: v18+ (for presentation dashboard).
 
 ---

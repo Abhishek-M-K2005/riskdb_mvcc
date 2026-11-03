@@ -282,26 +282,34 @@ static void BM_Hekaton_True_Validation(benchmark::State &state) {
 // ============================================================================
 BENCHMARK(BM_Traditional_Mutex)
     ->Threads(1)
+    ->Threads(2)
     ->Threads(4)
     ->Threads(8)
+    ->Threads(16)
     ->UseRealTime();
 
 BENCHMARK(BM_ZipfianWorkStealing)
     ->Threads(1)
+    ->Threads(2)
     ->Threads(4)
     ->Threads(8)
+    ->Threads(16)
     ->UseRealTime();
 
 BENCHMARK(BM_Cicada_Full_Architecture)
     ->Threads(1)
+    ->Threads(2)
     ->Threads(4)
     ->Threads(8)
+    ->Threads(16)
     ->UseRealTime();
 
 BENCHMARK(BM_Hekaton_True_Validation)
     ->Threads(1)
+    ->Threads(2)
     ->Threads(4)
     ->Threads(8)
+    ->Threads(16)
     ->UseRealTime();
 
 BENCHMARK_MAIN();

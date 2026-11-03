@@ -17,7 +17,11 @@ struct VersionNode {
   std::atomic<VersionNode *> next_version;
 
   VersionNode(TransactionID id, Epoch epoch, double val)
-      : tx_id(id), commit_epoch(epoch), value(val), next_version(nullptr) {}
+      : tx_id(id),
+        commit_epoch(epoch),
+        obsolete_epoch(0),
+        value(val),
+        next_version(nullptr) {}
 };
 
 // The head of the version chain for a specific database record

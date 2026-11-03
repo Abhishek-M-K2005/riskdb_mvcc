@@ -10,10 +10,14 @@ project(ParallelMVCCEngine CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-# Enable aggressive optimization for the engine
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=native")
+# Cross-platform aggressive compiler optimization
+if(MSVC)
+  add_compile_options(/O2 /W4)
+else()
+  add_compile_options(-O3 -march=native -Wall -Wextra)
+endif()
 
-# Support Homebrew libomp on macOS
+# macOS Homebrew libomp auto-detection (Linux & Windows detect OpenMP natively)
 if(APPLE)
   if(EXISTS "/opt/homebrew/opt/libomp")
     set(OpenMP_C_FLAGS "-Xpreprocessor -fopenmp -I/opt/homebrew/opt/libomp/include")
@@ -33,23 +37,40 @@ endif()
 # Find OpenMP (Real GCC handles this natively)
 find_package(OpenMP REQUIRED)
 
-# Fetch Google Test
-include(FetchContent)
-FetchContent_Declare(
-  googletest
-  URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
-)
-FetchContent_MakeAvailable(googletest)
+# Add system package search paths (macOS Homebrew, Linux /usr, Windows)
+list(APPEND CMAKE_PREFIX_PATH "/opt/homebrew" "/usr/local" "/usr")
 
-# Fetch Google Benchmark
-FetchContent_Declare(
-  googlebenchmark
-  URL https://github.com/google/benchmark/archive/v1.8.3.zip
-)
-# Disable Google Benchmark's internal tests and strict warnings
-set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
-set(BENCHMARK_ENABLE_WERROR OFF CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googlebenchmark)
+# Find Google Test (prefer local system installation, fallback to shallow git clone)
+find_package(GTest QUIET)
+if(NOT GTest_FOUND)
+  include(FetchContent)
+  FetchContent_Declare(
+    googletest
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG v1.14.0
+    GIT_SHALLOW TRUE
+  )
+  FetchContent_MakeAvailable(googletest)
+endif()
+
+if(TARGET GTest::gtest_main AND NOT TARGET gtest_main)
+  add_library(gtest_main ALIAS GTest::gtest_main)
+endif()
+
+# Find Google Benchmark (prefer local system installation, fallback to shallow git clone)
+find_package(benchmark QUIET)
+if(NOT benchmark_FOUND)
+  include(FetchContent)
+  FetchContent_Declare(
+    googlebenchmark
+    GIT_REPOSITORY https://github.com/google/benchmark.git
+    GIT_TAG v1.8.3
+    GIT_SHALLOW TRUE
+  )
+  set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+  set(BENCHMARK_ENABLE_WERROR OFF CACHE BOOL "" FORCE)
+  FetchContent_MakeAvailable(googlebenchmark)
+endif()
 
 # Include directories
 include_directories(include)

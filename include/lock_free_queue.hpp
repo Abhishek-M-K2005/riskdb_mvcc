@@ -19,8 +19,9 @@ private:
   const size_t capacity;
   const size_t mask;
 
-  alignas(64) std::atomic<size_t> head;
-  alignas(64) std::atomic<size_t> tail;
+  // Universal cross-architecture cache-line padding (covers 64B x86 and 128B ARM/SMP)
+  alignas(128) std::atomic<size_t> head;
+  alignas(128) std::atomic<size_t> tail;
 
 public:
   LockFreeQueue(size_t size)
