@@ -1,12 +1,12 @@
 {
-  "timestamp": "2026-11-03 22:15:38",
-  "elapsed_seconds": 0.101436,
+  "timestamp": "2026-11-04 08:25:15",
+  "elapsed_seconds": 0.101197,
   "num_transactions": 500000,
   "successful_commits": 500000,
-  "gc_tasks_completed": 499897,
-  "gc_collection_rate": 99.9794,
+  "gc_tasks_completed": 499903,
+  "gc_collection_rate": 99.9806,
   "initial_rows": 1000,
-  "active_versions_remaining": 103,
+  "active_versions_remaining": 97,
   "memory_leaks": 0,
-  "tps": 4929218
+  "tps": 4940853
 }

@@ -3,10 +3,42 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>MVCC Benchmark Dashboard</title>
+    <title>Parallel MVCC Engine — Evaluation & Benchmarks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+              serif: ['Newsreader', 'Georgia', 'serif'],
+              mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace']
+            },
+            colors: {
+              claude: {
+                bg: '#141311',
+                surface: '#1C1B18',
+                card: '#22201C',
+                subtle: '#2A2823',
+                border: '#33302A',
+                hover: '#38352E',
+                terracotta: '#D97757',
+                terracottaHover: '#C66545',
+                parchment: '#FAF9F5',
+                muted: '#948F85',
+                sage: '#6B9080',
+                amber: '#DDA15E'
+              }
+            }
+          }
+        }
+      }
+    </script>
   </head>
-  <body class="bg-slate-950">
+  <body class="bg-[#141311] text-[#FAF9F5] font-sans antialiased selection:bg-[#D97757] selection:text-white">
     <div id="root"></div>
     <script type="module" src="/src/index.jsx"></script>
   </body>
