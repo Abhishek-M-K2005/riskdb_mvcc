@@ -16,8 +16,9 @@ using namespace std;
 
 // System Configurations
 const int NUM_ROWS = 1000;
-const int NUM_TRANSACTIONS = 500000;
-const int QUEUE_CAPACITY = 65536; // Must be a power of 2
+const int NUM_TRANSACTIONS = 10000000; // 1 Crore (10 Million) transactions
+const int NUM_THREADS = 32;            // 32 Concurrent Parallel Threads
+const int QUEUE_CAPACITY = 65536;      // Must be a power of 2
 
 void save_telemetry_json(double elapsed_seconds, int commits, int pruned) {
   int remaining = commits - pruned;
@@ -75,7 +76,9 @@ int get_skewed_row(mt19937 &gen) {
 }
 
 int main() {
+  omp_set_num_threads(NUM_THREADS);
   cout << "--- Starting Parallel MVCC Transaction Engine ---" << endl;
+  cout << "Thread Count:          " << NUM_THREADS << " concurrent threads" << endl;
 
   // --- PHASE 1: System Warm-up ---
   vector<RowHeader *> database;

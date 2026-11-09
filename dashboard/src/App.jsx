@@ -45,6 +45,7 @@ const defaultFourWayScalingData = [
   { threads: '4 Threads', threadCount: 4, Mutex: 129.9, RiskDB_MVCC: 108.8, Cicada: 99.3, Hekaton: 103.6 },
   { threads: '8 Threads', threadCount: 8, Mutex: 223.8, RiskDB_MVCC: 174.1, Cicada: 171.2, Hekaton: 181.2 },
   { threads: '16 Threads', threadCount: 16, Mutex: 298.5, RiskDB_MVCC: 215.4, Cicada: 208.2, Hekaton: 221.7 },
+  { threads: '32 Threads', threadCount: 32, Mutex: 412.3, RiskDB_MVCC: 268.1, Cicada: 284.5, Hekaton: 295.2 },
 ];
 
 const defaultThreadScalingData = [
@@ -53,6 +54,7 @@ const defaultThreadScalingData = [
   { threads: '4 Threads', latency: 108.8, tps: 36.76, speedup: 3.12, type: 'Sweet Spot (Peak Scaling)' },
   { threads: '8 Threads', latency: 174.1, tps: 45.95, speedup: 3.90, type: 'Contention Bound' },
   { threads: '16 Threads', latency: 215.4, tps: 74.28, speedup: 6.30, type: 'SMT Saturation' },
+  { threads: '32 Threads', latency: 268.1, tps: 119.35, speedup: 10.12, type: 'High Oversubscription (32T)' },
 ];
 
 const defaultParadigmComparison = [
@@ -100,15 +102,15 @@ const skewSensitivityData = [
 
 const defaultEngineTelemetry = {
   timestamp: null,
-  elapsed_seconds: 0.104,
-  num_transactions: 500000,
-  successful_commits: 500000,
-  gc_tasks_completed: 499780,
-  gc_collection_rate: 99.956,
+  elapsed_seconds: 0.941,
+  num_transactions: 10000000,
+  successful_commits: 10000000,
+  gc_tasks_completed: 9999107,
+  gc_collection_rate: 99.991,
   initial_rows: 1000,
-  active_versions_remaining: 220,
+  active_versions_remaining: 893,
   memory_leaks: 0,
-  tps: 4805842
+  tps: 10627592
 };
 
 function parseGoogleBenchmarkData(json) {
@@ -157,6 +159,7 @@ function parseGoogleBenchmarkData(json) {
     if (s.threadCount === 4) type = 'Sweet Spot (Peak Scaling)';
     if (s.threadCount === 8) type = 'Contention Bound';
     if (s.threadCount === 16) type = 'SMT Saturation';
+    if (s.threadCount === 32) type = 'High Oversubscription (32T)';
     return {
       threads: s.threads,
       latency: lat,
@@ -286,6 +289,7 @@ export default function App() {
   const baseline1T = scalingData.find(s => s.threadCount === 1)?.RiskDB_MVCC || 84.8;
   const contention8T = scalingData.find(s => s.threadCount === 8)?.RiskDB_MVCC || 174.1;
   const contention16T = scalingData.find(s => s.threadCount === 16)?.RiskDB_MVCC;
+  const contention32T = scalingData.find(s => s.threadCount === 32)?.RiskDB_MVCC;
   const mutex8T = paradigmComp.find(p => p.paradigm.includes('Mutex'))?.latency || 223.8;
   const speedupOverMutex8T = ((mutex8T / contention8T) || 1.3).toFixed(1);
   const maxTps = Math.max(...paradigmComp.map(p => p.tps));
@@ -506,7 +510,7 @@ export default function App() {
                   </p>
                 </div>
                 <span className="px-2.5 py-1 bg-[#22201C] border border-[#2E2C26] text-[#DDA15E] text-xs font-mono rounded-lg">
-                  Workload: 500,000 txns | 1,000 rows
+                  Workload: 10,000,000 txns (1 Crore) | 1,000 rows
                 </span>
               </div>
 
@@ -660,6 +664,11 @@ export default function App() {
                   {contention16T && (
                     <span className="px-2.5 py-1 bg-[#22201C] border border-[#2E2C26] text-[#948F85] text-xs font-mono rounded-lg">
                       16T: {contention16T}ns
+                    </span>
+                  )}
+                  {contention32T && (
+                    <span className="px-2.5 py-1 bg-[#22201C] border border-[#2E2C26] text-[#D97757] text-xs font-mono rounded-lg">
+                      32T: {contention32T}ns
                     </span>
                   )}
                 </div>

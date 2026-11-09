@@ -286,6 +286,7 @@ BENCHMARK(BM_Traditional_Mutex)
     ->Threads(4)
     ->Threads(8)
     ->Threads(16)
+    ->Threads(32)
     ->UseRealTime();
 
 BENCHMARK(BM_ZipfianWorkStealing)
@@ -294,6 +295,7 @@ BENCHMARK(BM_ZipfianWorkStealing)
     ->Threads(4)
     ->Threads(8)
     ->Threads(16)
+    ->Threads(32)
     ->UseRealTime();
 
 BENCHMARK(BM_Cicada_Full_Architecture)
@@ -302,6 +304,7 @@ BENCHMARK(BM_Cicada_Full_Architecture)
     ->Threads(4)
     ->Threads(8)
     ->Threads(16)
+    ->Threads(32)
     ->UseRealTime();
 
 BENCHMARK(BM_Hekaton_True_Validation)
@@ -310,6 +313,7 @@ BENCHMARK(BM_Hekaton_True_Validation)
     ->Threads(4)
     ->Threads(8)
     ->Threads(16)
+    ->Threads(32)
     ->UseRealTime();
 
 BENCHMARK_MAIN();
