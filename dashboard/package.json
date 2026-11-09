@@ -6,7 +6,7 @@
   "scripts": {
     "start": "vite preview --port 3000",
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && cp -r dist build 2>/dev/null && cp -r dist ../build 2>/dev/null || true",
     "preview": "vite preview --port 3000",
     "bench:export": "(cd .. && ./build/mvcc_bench --benchmark_format=json) > public/benchmark_results.json && cp public/benchmark_results.json dist/ 2>/dev/null || true"
   },
